@@ -31,13 +31,7 @@ class PublicController extends BasePublicController {
             $inlinedata = $request["inlinedata"];
 
             if($request["type"]=="page") {
-
-                if(\LaravelLocalization::getDefaultLocale()==\LaravelLocalization::getCurrentLocale()) {
-                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/' . intval($request["id"]) . '.blade.php');
-                } else {
-                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/'.\LaravelLocalization::getCurrentLocale() ."/". intval($request["id"]) . '.blade.php');
-                }
-
+                if(!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/'.intval($request["id"]).'.blade.php');
 
                 $html = file_get_contents($tplpath);
 
@@ -50,9 +44,8 @@ class PublicController extends BasePublicController {
 
                 $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
 
-
-
                 foreach($inlinedata as $k=>$inlineitem) {
+
                     $nodes->item($k)->nodeValue='';
                     $this->appendHTML($nodes->item($k), $inlineitem);
                 }
@@ -61,10 +54,6 @@ class PublicController extends BasePublicController {
 
                 $html = file_get_contents($tplpath);
                 $html = str_replace(['<html><body>','</body></html>'],'',$html);
-
-
-                //Todo: Fix this replace.
-                $html = str_replace('$page-&gt;','$page->',$html);
                 file_put_contents($tplpath,$html);
 
 
