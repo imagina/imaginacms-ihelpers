@@ -33,11 +33,10 @@ class SidebarExtender implements \Maatwebsite\Sidebar\SidebarExtender
     {
         $menu->group(trans('core::sidebar.content'), function (Group $group) {
 
-
             $group->item(trans('ihelpers::common.clearcache'), function (Item $item) {
                 $item->icon('fa fa-eraser');
                 $item->weight(-1);
-                $item->route('admin.ihelpers.clearcache');
+                $item->route('dashboard.index');
             });
 
         });
