@@ -26,11 +26,16 @@ class ImCacheProfile extends BaseCacheProfile implements CacheProfile
             return false;
         }
 
-        if ($request->is('backend*') || $request->is('auth*')) {
-            return false;
+        $nocache = config('laravel-responsecache.nocache');
+        if(is_array($nocache)) {
+
+            foreach($nocache as $pattern) {
+                if ($request->is($pattern)) {
+                    return false;
+                }
+            }
+
         }
-
-
 
         return $request->isMethod('get');
     }

@@ -41,4 +41,10 @@ return [
     'public_page_cache' => true,
 
     'minifyhtml' => true,
+
+
+    /*
+     * You can define routes to pass to the function $request->is(). Example (backend*) (auth*)
+     */
+    'nocache' => array('backend*','auth*')
 ];
