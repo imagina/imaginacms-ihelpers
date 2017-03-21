@@ -31,29 +31,49 @@ class PublicController extends BasePublicController {
             $inlinedata = $request["inlinedata"];
 
             if($request["type"]=="page") {
-                if(!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/'.intval($request["id"]).'.blade.php');
+
+
+                if(\LaravelLocalization::getDefaultLocale()==\LaravelLocalization::getCurrentLocale()) {
+                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/' . intval($request["id"]) . '.blade.php');
+                } else {
+                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/'.\LaravelLocalization::getCurrentLocale() ."/". intval($request["id"]) . '.blade.php');
+                }
+
 
                 $html = file_get_contents($tplpath);
 
                 $dom = new DomDocument();
                 $dom->loadHTML($html, LIBXML_HTML_NODEFDTD);
                 //$dom->loadHTMLFile($tplpath, LIBXML_HTML_NODEFDTD);
-                
+
                 $finder = new DomXPath($dom);
                 $classname="icontenteditable";
 
                 $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
 
-                foreach($inlinedata as $k=>$inlineitem) {
 
-                    $nodes->item($k)->nodeValue='';
-                    $this->appendHTML($nodes->item($k), $inlineitem);
+                foreach($inlinedata as $k=>$inlineitem) {
+                    if(!empty($nodes) && is_object($nodes->item($k))) {
+                        $nodes->item($k)->nodeValue = '';
+                        $this->appendHTML($nodes->item($k), $inlineitem);
+                    }
                 }
 
                 $dom->saveHTMLFile($tplpath);
 
                 $html = file_get_contents($tplpath);
                 $html = str_replace(['<html><body>','</body></html>'],'',$html);
+
+
+                //Todo: Fix this replace.
+                $html = str_replace('$page-&gt;','$page->',$html);
+                $html = str_replace('view()-&gt;','view()->',$html);
+                $html = str_replace('%7B%7B','{{',$html);
+                $html = str_replace('%7D%7D','}}',$html);
+                $html = str_replace("=&gt;","=>",$html);
+
+
+
                 file_put_contents($tplpath,$html);
 
 
