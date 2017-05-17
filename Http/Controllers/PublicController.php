@@ -43,7 +43,9 @@ class PublicController extends BasePublicController {
                 $html = file_get_contents($tplpath);
 
                 $dom = new DomDocument();
+                libxml_use_internal_errors(true);
                 $dom->loadHTML($html, LIBXML_HTML_NODEFDTD);
+                libxml_clear_errors();
                 //$dom->loadHTMLFile($tplpath, LIBXML_HTML_NODEFDTD);
 
                 $finder = new DomXPath($dom);
