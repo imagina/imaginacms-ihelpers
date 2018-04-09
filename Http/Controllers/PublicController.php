@@ -34,9 +34,9 @@ class PublicController extends BasePublicController {
 
 
                 if(\LaravelLocalization::getDefaultLocale()==\LaravelLocalization::getCurrentLocale()) {
-                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/' . intval($request["id"]) . '.blade.php');
+                    if (!empty($request["id"])) $tplpath = base_path('Themes/'.setting('core::template').'/views/pages/content/' . intval($request["id"]) . '.blade.php');
                 } else {
-                    if (!empty($request["id"])) $tplpath = base_path('Themes/Imagina2017/views/pages/content/'.\LaravelLocalization::getCurrentLocale() ."/". intval($request["id"]) . '.blade.php');
+                    if (!empty($request["id"])) $tplpath = base_path('Themes/'.setting('core::template').'/views/pages/content/'.\LaravelLocalization::getCurrentLocale() ."/". intval($request["id"]) . '.blade.php');
                 }
 
 
