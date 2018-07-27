@@ -10,6 +10,17 @@ $router->group(['prefix' =>'/ihelpers'], function (Router $router) {
         'uses' => 'IhelpersController@clearcache',
         'middleware' => 'can:dashboard.index',
     ]);
+    $router->get('sitemapGet', [
+        'as' => 'admin.ihelpers.sitemapGet',
+        'uses' => 'IhelpersController@sitemapGet',
+        'middleware' => 'can:dashboard.index',
+    ]);
+
+    $router->post('sitemapPost', [
+        'as' => 'admin.ihelpers.sitemapPost',
+        'uses' => 'IhelpersController@sitemapPost',
+        'middleware' => 'can:dashboard.index',
+    ]);
 
 
 });

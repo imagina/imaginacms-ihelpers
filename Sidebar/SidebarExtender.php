@@ -39,6 +39,12 @@ class SidebarExtender implements \Maatwebsite\Sidebar\SidebarExtender
                 $item->route('admin.ihelpers.clearcache');
             });
 
+            $group->item(trans('ihelpers::common.sitemapTitle'), function (Item $item) {
+                $item->icon('fa fa-sitemap');
+                $item->weight(200);
+                $item->route('admin.ihelpers.sitemapGet');
+            });
+
         });
 
         return $menu;

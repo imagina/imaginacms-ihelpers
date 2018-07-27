@@ -30,6 +30,7 @@ class IhelpersServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->publishConfig('ihelpers', 'config');
         $this->publishConfig('ihelpers', 'permissions');
     }
 
