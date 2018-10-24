@@ -100,6 +100,10 @@ class PublicController extends BasePublicController {
         }
     }
 
+    function showSiteMap(){
+      return view('ihelpers::frontend.showSiteMap');
+    }//
+
 }
 
 ?>

@@ -10,8 +10,11 @@ $router->group(['prefix' =>'/inline'], function (Router $router) {
         'uses' => 'PublicController@inlinesave',
         //'middleware' => config('asgard.blog.config.middleware'),
     ]);
-
-
-
     // append
 });
+
+$router->get('/sitemap', [
+  'as' => 'ihelpers.sitemap',
+  'uses' => 'PublicController@showSiteMap',
+  //'middleware' => config('asgard.blog.config.middleware'),
+]);

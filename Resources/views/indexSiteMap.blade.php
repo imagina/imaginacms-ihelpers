@@ -26,14 +26,13 @@
                             <h3><strong><span id="message"></span></strong></h3>
                             <h4><strong>Number of routes generated:</strong> <span id="quantityroutes"></span></h4>
                             <h4><strong>Number of sitemap.xml generated:</strong> <span id="quantitysitemap"></span> </h4>
-                            <h4><strong>Sitemap html path:</strong> <span id="htmlpath"></span> </h4>
                             <h4><strong>Sitemap xml path:</strong> <span id="xmlpath"></span> </h4>
                         </div>
                         <div class="col-md-12 table-responsive">
                             <table id="tableRoutes" class="table table-bordered table-striped table-sm">
                                 <thead class="thead-light">
                                     <th>#</th>
-                                    <th>Tittle</th>
+                                    <th>Title</th>
                                     <th>Type</th>
                                     <th>Route</th>
                                 </thead>
@@ -70,22 +69,62 @@
                         $('#message').html("The site map has been generated successfully.");
                         $('#quantityroutes').html(result['QuantityOfUrl']);
                         $('#quantitysitemap').html(result['QuantityOfSiteMap']);
-                        $('#htmlpath').html('<a href="'+result["SiteHtmlPath"]+'">'+result["SiteHtmlPath"]+'</a>');
                         $('#xmlpath').html('<a href="'+result["SiteXmlPath"]+'">'+result["SiteXmlPath"]+'</a>');
                         var count=0;
-                        for(var i=0;i<result['Routes'].length;i++){
+                        //For Pages
+                        for(var i=0;i<result.Routes.Pages.length;i++){
                             //console.log(result['Routes'][i]);
-                            count=i+1;
+                            // console.log(result.Routes.Pages[i].title);
+                            count++;
                             htmlTbody+="<tr>";
                             htmlTbody+="<td>"+count+"</td>";
-                            htmlTbody+="<td>"+result['Routes'][i]['title']+"</td>";
-                            htmlTbody+="<td>"+result['Routes'][i]['type']+"</td>";
-                            htmlTbody+="<td>"+result['Routes'][i]['route']+"</td>";
+                            htmlTbody+="<td>"+result.Routes.Pages[i].title+"</td>";
+                            htmlTbody+="<td>Page</td>";
+                            htmlTbody+="<td>"+result.Routes.Pages[i].url+"</td>";
                             htmlTbody+="</tr>";
-                        }//for routes
+                        }//for Pages
+                        //For Categories
+                        for(var i=0;i<result.Routes.Categories.length;i++){
+                            //console.log(result['Routes'][i]);
+                            count++;
+                            htmlTbody+="<tr>";
+                            htmlTbody+="<td>"+count+"</td>";
+                            htmlTbody+="<td>"+result.Routes.Categories[i].title+"</td>";
+                            htmlTbody+="<td>Category</td>";
+                            htmlTbody+="<td>"+result.Routes.Categories[i].url+"</td>";
+                            htmlTbody+="</tr>";
+                            for(var b=0;b<result.Routes.Categories[i].elements.length;b++){
+                              count++;
+                              htmlTbody+="<tr>";
+                              htmlTbody+="<td>"+count+"</td>";
+                              htmlTbody+="<td>"+result.Routes.Categories[i].elements[b].title+"</td>";
+                              htmlTbody+="<td>Product</td>";
+                              htmlTbody+="<td>"+result.Routes.Categories[i].elements[b].url+"</td>";
+                              htmlTbody+="</tr>";
+                            }//for
+                            for(var b=0;b<result.Routes.Categories[i].subCategory.length;b++){
+                              count++;
+                              htmlTbody+="<tr>";
+                              htmlTbody+="<td>"+count+"</td>";
+                              htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].title+"</td>";
+                              htmlTbody+="<td>SubCategory</td>";
+                              htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].url+"</td>";
+                              htmlTbody+="</tr>";
+                              for(var s=0;s<result.Routes.Categories[i].subCategory[b].elements.length;s++){
+                                count++;
+                                htmlTbody+="<tr>";
+                                htmlTbody+="<td>"+count+"</td>";
+                                htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].elements[s].title+"</td>";
+                                htmlTbody+="<td>Product</td>";
+                                htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].elements[s].url+"</td>";
+                                htmlTbody+="</tr>";
+                              }//for
+                            }//for
+                        }//for Categories
                         $('#tableRoutes tbody').html(htmlTbody);
                         $('#tableRoutes').DataTable();
-                        $('#generateButton').hide();
+                        // $('#generateButton').hide();
+                        $('#generateButton').val('Update SiteMap');
                         $('#success').show();
                     }else{
                         $('#generateButton').show();

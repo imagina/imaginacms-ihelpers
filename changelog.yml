@@ -1,0 +1,6 @@
+url: https://github.com/imagina/asgardcms-icommerce
+versions:
+    "3.0.6":
+        changed:
+          - view frontend site map
+          - config SiteMap

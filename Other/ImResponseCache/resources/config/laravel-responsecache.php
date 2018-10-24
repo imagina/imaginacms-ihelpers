@@ -42,6 +42,7 @@ return [
 
     'minifyhtml' => true,
 
+    'cacheLoggedInUsers' => false,
 
     /*
      * You can define routes to pass to the function $request->is(). Example (backend*) (auth*)

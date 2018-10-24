@@ -22,6 +22,10 @@ class ImCacheProfile extends BaseCacheProfile implements CacheProfile
             return false;
         }
 
+        if(!config('laravel-responsecache.cacheLoggedInUsers') || !$request->user()) {
+            return false;
+        }
+
         if ($this->isRunningInConsole()) {
             return false;
         }
