@@ -127,13 +127,13 @@ class IhelpersController extends AdminBaseController
         if($b==0){
           $xml="<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
           $xml .='<url><loc>'.$page->url.'</loc>
-          <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+          <lastmod>'.date("Y-m-d").'</lastmod>
           <priority>1.00</priority></url>';
         }else{
           $xml .=
           '<url>
           <loc>'.$page->url.'</loc>
-          <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+          <lastmod>'.date("Y-m-d").'</lastmod>
           <priority>1.00</priority>
           </url>';
         }
@@ -157,7 +157,7 @@ class IhelpersController extends AdminBaseController
         $xml .=
         '<url>
         <loc>'.$category->url.'</loc>
-        <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+        <lastmod>'.date("Y-m-d").'</lastmod>
         <priority>1.00</priority>
         </url>';
         $counter++;
@@ -180,7 +180,7 @@ class IhelpersController extends AdminBaseController
             $xml .=
             '<url>
             <loc>'.$product->url.'</loc>
-            <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+            <lastmod>'.date("Y-m-d").'</lastmod>
             <priority>1.00</priority>
             </url>';
             $counter++;
@@ -205,7 +205,7 @@ class IhelpersController extends AdminBaseController
             $xml .=
             '<url>
             <loc>'.$subcategory->url.'</loc>
-            <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+            <lastmod>'.date("Y-m-d").'</lastmod>
             <priority>1.00</priority>
             </url>';
             $counter++;
@@ -228,7 +228,7 @@ class IhelpersController extends AdminBaseController
                 $xml .=
                 '<url>
                 <loc>'.$product->url.'</loc>
-                <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+                <lastmod>'.date("Y-m-d").'</lastmod>
                 <priority>1.00</priority>
                 </url>';
                 $counter++;
@@ -249,7 +249,7 @@ class IhelpersController extends AdminBaseController
       //Make sitemap.xml index and relation with others sitemap
       for($i=0;$i<$sitemapCounter;$i++){
         $xml.='<sitemap><loc>'.env('APP_URL').'/sitemap-'.$i.'.xml</loc>
-        <lastmod>'.date("Y-m-d H:i:s").'</lastmod>
+        <lastmod>'.date("Y-m-d").'</lastmod>
         </sitemap>';
       }//for
       $xml.="</sitemapindex>";//close sitemapindex
