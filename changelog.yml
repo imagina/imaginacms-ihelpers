@@ -1,10 +1,13 @@
 url: https://github.com/imagina/asgardcms-icommerce
 versions:
     "3.0.8":
-        added:
-          - function helper youtubeID
-          - function helper
+        changed:
+          - NameSpace MenuApiController
+          - views SiteMap
     "3.0.7":
+        added:
+              - function helper youtubeID
+              - function helper
         changed:
           - AdminController format date sitemap.xml
     "3.0.6":

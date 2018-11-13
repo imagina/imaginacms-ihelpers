@@ -35,6 +35,10 @@ ul{
 .text-color_dark:hover .icon_wrap_size_0, .text-color_dark:hover .icon_wrap_size_0 i{
   color: #25858a;
 }
+#hoverColor:hover{
+  color:#3056A0!important;
+  cursor:pointer;
+}
 </style>
 <div class="sitemap">
   <!--page title-->
@@ -73,7 +77,7 @@ ul{
       $html.='<span class="icon_wrap_size_0"'.$temp.'>';
       $html.='<i class="fa fa-angle-right"></i>';
       $html.='</span>';
-      $html.='<a href="'.$subcategory->url.'" class="text-color_dark d-inline-block">';
+      $html.='<a href="'.$subcategory->url.'" class="text-color_dark d-inline-block font-weight-bold">';
       $html.=$subcategory->title;
       $html.='</a>';
       $html.='</li>';
@@ -107,7 +111,7 @@ ul{
     <div class="container">
       <div class="row">
         <!-- PAGES -->
-        <div class="col-12 col-md-6 col-lg-3">
+        <div class="col-12 col-md-6 col-lg-4">
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.pages')}}</h5>
           <ul>
             @foreach($sitemapJson->Pages as $page)
@@ -122,8 +126,9 @@ ul{
             @endforeach
           </ul>
         </div>
+        @if(count($sitemapJson->Manufacturers))
         <!-- BRANDS -->
-        <div class="col-12 col-md-6 col-lg-3">
+        <div class="col-12 col-md-6 col-lg-4">
           <h5 class="font-weight-bold mb-2">{{trans('ihelpers::common.sitemap.brands')}}</h5>
           <ul>
             @foreach($sitemapJson->Manufacturers as $brand)
@@ -138,8 +143,10 @@ ul{
             @endforeach
           </ul>
         </div>
+        @endif
         <!-- POST -->
-        <div class="col-12 col-md-6 col-lg-3">
+        @if(count($sitemapJson->Posts))
+        <div class="col-12 col-md-6 col-lg-4">
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.posts')}}</h5>
           <ul>
             @foreach($sitemapJson->Posts as $category)
@@ -178,7 +185,9 @@ ul{
             @endforeach
           </ul>
         </div>
+        @endif
         <!-- PRODUCTS -->
+        @if(count($sitemapJson->Products))
         <div class="col-12 col-md-6 col-lg-3">
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.products')}}</h5>
           <ul>
@@ -190,7 +199,7 @@ ul{
                   @endif >
                   <i class="fa fa-angle-right"></i>
                 </span>
-                <a href="{{$category->url}}" class="text-color_dark d-inline-block">
+                <a href="{{$category->url}}" class="text-color_dark d-inline-block font-weight-bold">
                   {{$category->title}}
                 </a>
               </li>
@@ -218,7 +227,7 @@ ul{
             @endforeach
           </ul>
         </div>
-
+@endif
         {{-- <div class="col-12 col-md-6 col-lg-4">
 
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.products')}}</h5>

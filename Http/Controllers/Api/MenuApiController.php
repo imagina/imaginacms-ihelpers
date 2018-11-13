@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Icustom\Http\Controllers\Api;
+namespace Modules\Ihelpers\Http\Controllers\Api;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
