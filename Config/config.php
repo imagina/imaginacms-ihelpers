@@ -5,17 +5,26 @@ return [
 	'configurationv2'=>[
 		/*[
 			'Name'=>'Products',
-			'RepositoryCategory'=>'Modules\Icommerce\Repositories\CategoryRepository',
-			'RepositoryProducts'=>'Modules\Icommerce\Repositories\ProductRepository'
+			'Categories'=>true,
+			'Repository'=>'Modules\Icommerce\Repositories\CategoryRepository',
+			'RepositoryItems'=>'Modules\Icommerce\Repositories\ProductRepository'
+
 		],*/
 		[
 			'Name'=>'Pages',
-			'RepositoryPages'=>'Modules\Page\Repositories\PageRepository'
+			'Categories'=>false,
+			'Repository'=>'Modules\Page\Repositories\PageRepository'
 		],
 		[
-			'Name'=>'Post',
-			'RepositoryCategory'=>'Modules\Iblog\Repositories\CategoryRepository',
-			'RepositoryPost'=>'Modules\Iblog\Repositories\PostRepository'
-		]
+			'Name'=>'Posts',
+			'Categories'=>true,
+			'Repository'=>'Modules\Iblog\Repositories\CategoryRepository',
+			'RepositoryItems'=>'Modules\Iblog\Repositories\PostRepository'
+		],
+		/*[
+			'Name'=>'Manufacturers',
+			'Categories'=>false,
+			'Repository'=>'Modules\Icommerce\Repositories\ManufacturerRepository'
+		]*/
 	]
 ];

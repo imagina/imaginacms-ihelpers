@@ -9,6 +9,8 @@ return [
       'home'=>'Inicio',
       'products'=>'Productos',
       'pages'=>'Páginas',
-      'posts'=>'Publicaciones'
+      'posts'=>'Publicaciones',
+      'brands'=>'Marcas',
+      'seeMore'=>'Ver más'
     ]
 ];

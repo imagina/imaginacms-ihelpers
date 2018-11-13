@@ -17,15 +17,16 @@ class BaseApiController extends BasePublicController
     }
 
     //Request URL Get Standard or set default values
-    public function parametersUrl($page = false, $take = false, $filter = [], $include = [])
+    public function parametersUrl($page = false, $take = false, $filter = [], $include = [], $fields = [])
     {
         $request = request();
 
         return (object)[
             "page" => is_numeric($request->input('page')) ? $request->input('page') : $page,
             "take" => is_numeric($request->input('take')) ? $request->input('take') : $take,
-            "filter" => $request->input('filter') ? json_decode($request->input('filter')) : $filter,
-            "include" => $request->input('include') ? explode(",", $request->input('include')) : $include
+            "filter" => json_decode($request->input('filter')) ?? (object)$filter,
+            "include" => $request->input('include') ? explode(",", $request->input('include')) : $include,
+            "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $fields
         ];
     }
 

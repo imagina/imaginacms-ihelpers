@@ -9,6 +9,8 @@ return [
       'home'=>'Home',
       'products'=>'Products',
       'pages'=>'Pages',
-      'posts'=>'Posts'
+      'posts'=>'Posts',
+      'brands'=>'Brands',
+      'seeMore'=>'See more'
     ]
 ];

@@ -33,7 +33,6 @@
                                 <thead class="thead-light">
                                     <th>#</th>
                                     <th>Title</th>
-                                    <th>Type</th>
                                     <th>Route</th>
                                 </thead>
                                 <tbody></tbody>
@@ -72,55 +71,19 @@
                         $('#xmlpath').html('<a href="'+result["SiteXmlPath"]+'">'+result["SiteXmlPath"]+'</a>');
                         var count=0;
                         //For Pages
-                        for(var i=0;i<result.Routes.Pages.length;i++){
+                        for(var i=0;i<result.Routes.length;i++){
                             //console.log(result['Routes'][i]);
                             // console.log(result.Routes.Pages[i].title);
                             count++;
                             htmlTbody+="<tr>";
                             htmlTbody+="<td>"+count+"</td>";
-                            htmlTbody+="<td>"+result.Routes.Pages[i].title+"</td>";
-                            htmlTbody+="<td>Page</td>";
-                            htmlTbody+="<td>"+result.Routes.Pages[i].url+"</td>";
+                            htmlTbody+="<td>"+result.Routes[i].title+"</td>";
+                            htmlTbody+="<td>"+result.Routes[i].url+"</td>";
                             htmlTbody+="</tr>";
                         }//for Pages
-                        //For Categories
-                        for(var i=0;i<result.Routes.Categories.length;i++){
-                            //console.log(result['Routes'][i]);
-                            count++;
-                            htmlTbody+="<tr>";
-                            htmlTbody+="<td>"+count+"</td>";
-                            htmlTbody+="<td>"+result.Routes.Categories[i].title+"</td>";
-                            htmlTbody+="<td>Category</td>";
-                            htmlTbody+="<td>"+result.Routes.Categories[i].url+"</td>";
-                            htmlTbody+="</tr>";
-                            for(var b=0;b<result.Routes.Categories[i].elements.length;b++){
-                              count++;
-                              htmlTbody+="<tr>";
-                              htmlTbody+="<td>"+count+"</td>";
-                              htmlTbody+="<td>"+result.Routes.Categories[i].elements[b].title+"</td>";
-                              htmlTbody+="<td>Product</td>";
-                              htmlTbody+="<td>"+result.Routes.Categories[i].elements[b].url+"</td>";
-                              htmlTbody+="</tr>";
-                            }//for
-                            for(var b=0;b<result.Routes.Categories[i].subCategory.length;b++){
-                              count++;
-                              htmlTbody+="<tr>";
-                              htmlTbody+="<td>"+count+"</td>";
-                              htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].title+"</td>";
-                              htmlTbody+="<td>SubCategory</td>";
-                              htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].url+"</td>";
-                              htmlTbody+="</tr>";
-                              for(var s=0;s<result.Routes.Categories[i].subCategory[b].elements.length;s++){
-                                count++;
-                                htmlTbody+="<tr>";
-                                htmlTbody+="<td>"+count+"</td>";
-                                htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].elements[s].title+"</td>";
-                                htmlTbody+="<td>Product</td>";
-                                htmlTbody+="<td>"+result.Routes.Categories[i].subCategory[b].elements[s].url+"</td>";
-                                htmlTbody+="</tr>";
-                              }//for
-                            }//for
-                        }//for Categories
+                        if ( $.fn.DataTable.isDataTable('#tableRoutes') ) {
+                          $('#tableRoutes').DataTable().destroy();
+                        }
                         $('#tableRoutes tbody').html(htmlTbody);
                         $('#tableRoutes').DataTable();
                         // $('#generateButton').hide();

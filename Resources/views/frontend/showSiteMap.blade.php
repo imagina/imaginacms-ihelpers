@@ -49,7 +49,7 @@ ul{
         <div class="col-auto text-center">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent mb-0">
-              <li class="breadcrumb-item "><a class="text-white" href="{{ URL::to('/') }}">Home</a></li>
+              <li class="breadcrumb-item "><a class="text-white" href="{{ URL::to('/') }}">{{trans('ihelpers::common.sitemap.home')}}</a></li>
               <li class="breadcrumb-item text-white active" aria-current="page">{{trans('ihelpers::common.sitemap.title')}}</li>
             </ol>
           </nav>
@@ -61,24 +61,60 @@ ul{
 @php
   $sitemapJson=json_decode(Storage::disk('publicmedia')->get('sitemap.json'));
   //dd($sitemapJson);
-  $loopCategory=5;
-  $loopSubCategory=5;
+  function recursive($array,$categoryTitle){
+    $html='<ul >';
+    foreach($array as $subcategory){
+      $html.='<li class="m_bottom_12 text-capitalize">';
+      $temp='';
+      if(isset($subcategory->children) || isset($subcategory->items)){
+        $temp='title="'.trans('ihelpers::common.sitemap.seeMore').'" data-toggle="collapse" href="#IcChildren'.$subcategory->title.'" ';
+        $temp.='role="button" aria-expanded="false" aria-controls="IcChildren'.$subcategory->title.'"';
+      }
+      $html.='<span class="icon_wrap_size_0"'.$temp.'>';
+      $html.='<i class="fa fa-angle-right"></i>';
+      $html.='</span>';
+      $html.='<a href="'.$subcategory->url.'" class="text-color_dark d-inline-block">';
+      $html.=$subcategory->title;
+      $html.='</a>';
+      $html.='</li>';
+      $html.='<div class="collapse" id="IcChildren'.$subcategory->title.'">';
+      if(isset($subcategory->children)){
+        $html.=recursive($subcategory->children,$subcategory->title);
+      }
+      if(isset($subcategory->items)){
+        $html.='<ul class="mt-2" >';
+        foreach($subcategory->items as $products){
+          $html.='<li class="m_bottom_12 text-capitalize">';
+          $html.='<a href="'.$products->url.'" class="text-color_dark d-inline-block">';
+          $html.='<span class="icon_wrap_size_0 ">';
+          $html.='<i class="fa fa-angle-right"></i>';
+          $html.='</span>';
+          $html.=$products->title;
+          $html.='</a>';
+          $html.='</li>';
+        }//foreach items
+        $html.='</ul>';
+      }//if have items
+      $html.="</div>";
+    }//foreach
+    $html.='</ul>';
+    return $html;
+  }
 @endphp
 
   <!--content-->
   <div class="page-content pb-5">
     <div class="container">
       <div class="row">
-
-        <div class="col-12 col-md-6 col-lg-4">
-
+        <!-- PAGES -->
+        <div class="col-12 col-md-6 col-lg-3">
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.pages')}}</h5>
           <ul>
             @foreach($sitemapJson->Pages as $page)
             <li class="mb-2">
               <a href="{{$page->url}}" class="text-color_dark d-inline-block">
-				<span class="icon_wrap_size_0 ">
-			      <i class="fa fa-angle-right"></i>
+                <span class="icon_wrap_size_0 ">
+                  <i class="fa fa-angle-right"></i>
                 </span>
                 {{$page->title}}
               </a>
@@ -86,8 +122,104 @@ ul{
             @endforeach
           </ul>
         </div>
+        <!-- BRANDS -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <h5 class="font-weight-bold mb-2">{{trans('ihelpers::common.sitemap.brands')}}</h5>
+          <ul>
+            @foreach($sitemapJson->Manufacturers as $brand)
+            <li class="mb-2">
+              <a href="{{$brand->url}}" class="text-color_dark d-inline-block text-capitalize">
+                <span class="icon_wrap_size_0 ">
+                  <i class="fa fa-angle-right"></i>
+                </span>
+                {{$brand->title}}
+              </a>
+            </li>
+            @endforeach
+          </ul>
+        </div>
+        <!-- POST -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.posts')}}</h5>
+          <ul>
+            @foreach($sitemapJson->Posts as $category)
+              <li class="mb-2">
+                <span class="icon_wrap_size_0" @if(isset($category->children) || isset($category->items))
+                  title="{{trans('ihelpers::common.sitemap.seeMore')}}" data-toggle="collapse" href="#IcChildren{{$category->title}}"
+                  role="button" aria-expanded="false" aria-controls="IcChildren{{$category->title}}"
+                  @endif >
+                  <i class="fa fa-angle-right"></i>
+                </span>
+                <a href="{{$category->url}}" class="text-color_dark d-inline-block">
+                  {{$category->title}}
+                </a>
+              </li>
+              <div class="collapse" id="IcChildren{{$category->title}}">
+                @if(isset($category->children))
+                  @php
+                    echo recursive($category->children,$category->title)
+                  @endphp
+                @endif
+                @if(isset($category->items))
+                <ul class="mt-2" >
+                  @foreach($category->items as $products)
+                  <li class="m_bottom_12 text-capitalize">
+                    <a href="{{$products->url}}" class="text-color_dark d-inline-block">
+                      <span class="icon_wrap_size_0 ">
+                        <i class="fa fa-angle-right"></i>
+                      </span>
+                      {{$products->title}}
+                    </a>
+                  </li>
+                  @endforeach
+                </ul>
+                @endif
+              </div>
+            @endforeach
+          </ul>
+        </div>
+        <!-- PRODUCTS -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.products')}}</h5>
+          <ul>
+            @foreach($sitemapJson->Products as $category)
+              <li class="mb-2">
+                <span class="icon_wrap_size_0" @if(isset($category->children))
+                  title="{{trans('ihelpers::common.sitemap.seeMore')}}" data-toggle="collapse" href="#IcChildren{{$category->title}}"
+                  role="button" aria-expanded="false" aria-controls="IcChildren{{$category->title}}"
+                  @endif >
+                  <i class="fa fa-angle-right"></i>
+                </span>
+                <a href="{{$category->url}}" class="text-color_dark d-inline-block">
+                  {{$category->title}}
+                </a>
+              </li>
+              <div class="collapse" id="IcChildren{{$category->title}}">
+              @if(isset($category->children))
+                @php
+                  echo recursive($category->children,$category->title)
+                @endphp
+              @endif
+              @if(isset($category->items))
+                <ul class="mt-2">
+                  @foreach($category->items as $products)
+                  <li class="m_bottom_12 text-capitalize">
+                    <a href="{{$products->url}}" class="text-color_dark d-inline-block">
+                      <span class="icon_wrap_size_0 ">
+                        <i class="fa fa-angle-right"></i>
+                      </span>
+                      {{$products->title}}
+                    </a>
+                  </li>
+                  @endforeach
+                </ul>
+              @endif
+            </div>
+            @endforeach
+          </ul>
+        </div>
 
-        <div class="col-12 col-md-6 col-lg-4">
+        {{-- <div class="col-12 col-md-6 col-lg-4">
 
           <h5 class="font-weight-bold mb-3">{{trans('ihelpers::common.sitemap.products')}}</h5>
           <ul>
@@ -100,18 +232,17 @@ ul{
                    @if(count($category->elements)>0) data-toggle="collapse" href="#collapseElements{{$loopCategory}}" role="button" aria-expanded="false" aria-controls="collapseElements{{$loopCategory}}"
                    @else href="{{$category->url}}"
                    @endif>
-				  <span class="icon_wrap_size_0 ">
+				           <span class="icon_wrap_size_0 ">
 			        <i class="fa fa-angle-right"></i>
                   </span>
                   {{$category->title}}
                 </a>
                 @foreach($category->elements as $productCategory)
-                  <!--sitemap (second level) -->
                   <ul class="collapse mt-2" id="collapseElements{{$loopCategory}}">
                     <li class="m_bottom_12 text-capitalize">
                       <a href="{{$productCategory->url}}" class="text-color_dark d-inline-block">
-					    <span class="icon_wrap_size_0 ">
-			              <i class="fa fa-angle-right"></i>
+					               <span class="icon_wrap_size_0 ">
+			                     <i class="fa fa-angle-right"></i>
                         </span>
                         {{$productCategory->title}}
                       </a>
@@ -130,7 +261,6 @@ ul{
                     {{$subcategory->title}}
                   </a>
                   @foreach($subcategory->elements as $productSubCategory)
-                    <!--sitemap (second level) -->
                     <ul class="collapse mt-2" id="collapse{{$subcategory->title}}">
                         <li class="mb-2 text-capitalize">
                           <a href="{{$productSubCategory->url}}" class="text-color_dark d-inline-block">
@@ -147,7 +277,7 @@ ul{
               </li>
             @endforeach
           </ul>
-        </div>
+        </div> --}}
 
       </div>
     </div>
