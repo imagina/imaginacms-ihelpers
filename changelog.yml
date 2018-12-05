@@ -1,5 +1,8 @@
 url: https://github.com/imagina/asgardcms-icommerce
 versions:
+    "3.0.9":
+        changed:
+          - Add method getParamsRequest to BaseApiController
     "3.0.8":
         changed:
           - NameSpace MenuApiController
