@@ -1,16 +1,19 @@
 url: https://github.com/imagina/asgardcms-icommerce
 versions:
+    3.0.10":
+        added:
+          - Function Helper YoutubeID
     "3.0.9":
-        changed:
-          - Add method getParamsRequest to BaseApiController
+        add:
+          - Method getParamsRequest to BaseApiController
     "3.0.8":
         changed:
           - NameSpace MenuApiController
-          - views SiteMap
+          - Views SiteMap
     "3.0.7":
         added:
-              - function helper youtubeID
-              - function helper
+          - function helper youtubeID
+          - function helper
         changed:
           - AdminController format date sitemap.xml
     "3.0.6":

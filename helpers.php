@@ -226,3 +226,17 @@ if (!function_exists('saveImage')) {
 
     }
 }
+
+if(! function_exists('youtubeID')) {
+    function youtubeID($url)
+    {
+        if (strlen($url) > 11) {
+            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
+                return 'https://www.youtube.com/embed/'.$match[1];
+            } else
+                return false;
+        }
+
+        return $url;
+    }
+}
