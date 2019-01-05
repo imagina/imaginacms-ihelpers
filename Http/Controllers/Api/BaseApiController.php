@@ -2,12 +2,13 @@
 
 namespace Modules\Ihelpers\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use Log;
-use Mockery\CountValidator\Exception;
 use Modules\Core\Http\Controllers\BasePublicController;
-use Modules\User\Transformers\UserProfileTransformer;
+use Mockery\CountValidator\Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Validator;
 use Route;
+use Log;
 
 class BaseApiController extends BasePublicController
 {
@@ -31,30 +32,90 @@ class BaseApiController extends BasePublicController
   }
 
   //Return params from Request
-  public function getParamsRequest($params = [])
+  public function getParamsRequest($request, $params = [])
   {
     //Convert to object the params
-    $params = (object)$params;
-    //Set default values
-    $params = (object)[
-      "page" => $params->page ?? false,
-      "take" => $params->take ?? false,
-      "filter" => $params->filter ?? [],
-      'include' => $params->include ?? [],
-      'fields' => $params->fields ?? []
-    ];
+    $defaultValues = (object)$params;
 
-    //Get params from Request
-    $request = request();
+    //Set default values
+    $default = (object)[
+      "page" => $defaultValues->page ?? false,
+      "take" => $defaultValues->take ?? false,
+      "filter" => $defaultValues->filter ?? [],
+      'include' => $defaultValues->include ?? [],
+      'fields' => $defaultValues->fields ?? []
+    ];
 
     //Return params
-    return (object)[
-      "page" => is_numeric($request->input('page')) ? $request->input('page') : $params->page,
-      "take" => is_numeric($request->input('take')) ? $request->input('take') : $params->take,
-      "filter" => json_decode($request->input('filter')) ?? (object)$params->filter,
-      "include" => $request->input('include') ? explode(",", $request->input('include')) : $params->include,
-      "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $params->fields
+    $params = (object)[
+      "page" => is_numeric($request->input('page')) ? $request->input('page') : $default->page,
+      "take" => is_numeric($request->input('take')) ? $request->input('take') :
+        ($request->input('page') ? 12 : $default->take),
+      "filter" => json_decode($request->input('filter')) ?? (object)$default->filter,
+      "include" => $request->input('include') ? explode(",", $request->input('include')) : $default->include,
+      "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $default->fields,
+      "user" => Auth::user(),
     ];
+
+    //set language translation
+    if (isset($params->filter->locale) && !is_null($params->filter->locale))
+      \App::setLocale($params->filter->locale);
+
+    return $params;
+  }
+
+  //Validate if response Api is successful
+  public function validateResponseApi($response)
+  {
+    //Get response
+    $data = json_decode($response->content());
+
+    //If there is errors, throw error
+    if (isset($data->errors))
+      throw new Exception($data->errors, $response->getStatusCode());
+    else {//if response is successful, return response
+      return $data->data;
+    }
+  }
+
+  //Validate if fields are validated according to rules
+  public function validateRequestApi($request)
+  {
+    //Create Validator
+    $validator = Validator::make($request->all(), $request->rules());
+
+    //if get errors, throw errors
+    if ($validator->fails()) {
+      $errors = json_decode($validator->errors());
+      throw new Exception(json_encode($errors), 401);
+    } else {//if vlaidation is sucessful, return true
+      return true;
+    }
+  }
+
+  //Validate if code is like status response, and return status code
+  public function getStatusError($code = false)
+  {
+    switch ($code) {
+      case 401:
+        return 401;
+        break;
+      case 403:
+        return 403;
+        break;
+      case 404:
+        return 404;
+        break;
+      case 502:
+        return 502;
+        break;
+      case 504:
+        return 504;
+        break;
+      default:
+        return 500;
+        break;
+    }
   }
 
   //Transform data of Paginate
@@ -66,5 +127,11 @@ class BaseApiController extends BasePublicController
       "perPage" => $data->perPage(),
       "currentPage" => $data->currentPage()
     ];
+  }
+
+  //Return current user
+  public function getAuthUser()
+  {
+    return Auth::user();
   }
 }
