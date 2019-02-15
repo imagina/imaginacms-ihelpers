@@ -1,5 +1,9 @@
 url: https://github.com/imagina/asgardcms-icommerce
-
+    "3.0.12":
+        added:
+          -Disallow Apì routes and review Robots.txt IhelpersControlers
+        changed:
+          -Update SaveImage Helper.
     "3.0.11":
         added:
           - BaseApiTranformer
