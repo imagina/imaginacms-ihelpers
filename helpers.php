@@ -193,7 +193,7 @@ if (!function_exists('saveImage')) {
                 $constraint->upsize();
             });
             if ($watermark->activated) {
-                $image->insert($watermark->url, $watermark->position, $watermark->x, $watermark->y);
+                $image->insert(\Storage::disk($disk)->url($watermark->url), $watermark->position, $watermark->x, $watermark->y);
             }
             // 2. Store the image on disk.
             \Storage::disk($disk)->put($destination_path, $image->stream('jpg', $size->imagesize->quality));

@@ -204,7 +204,8 @@ class IhelpersController extends AdminBaseController
         $xml.="</sitemapindex>";//close sitemapindex
         Storage::disk('publicmedia')->put('sitemap.xml', $xml);//Make sitemap.xml,
         $content="User-agent: *\n";
-        $content.="Disallow: \n";
+        $content.="Disallow: api/* \n";
+        $content.="Disallow: review/* \n";
         $content.="\nSitemap: ".env('APP_URL')."/sitemap.xml";
         Storage::disk('publicmedia')->put('robots.txt',$content);//Make robots.txt
 
