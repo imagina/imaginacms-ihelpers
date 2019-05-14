@@ -1,4 +1,11 @@
 url: https://github.com/imagina/asgardcms-icommerce
+    "3.6.0":
+      added:
+        - eventes base imageable for all Modules
+        - Helper validateJson
+      changed:
+        - Update SaveImage Helper.
+        - BaseApiController metods
     "3.0.12":
         added:
           -Disallow Apì routes and review Robots.txt IhelpersControlers

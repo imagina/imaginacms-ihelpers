@@ -6,36 +6,25 @@ use Modules\Core\Http\Controllers\BasePublicController;
 use Mockery\CountValidator\Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Modules\Iprofile\Entities\Role;
 use Validator;
 use Route;
 use Log;
 
 class BaseApiController extends BasePublicController
 {
+  private $permissions;
+  private $user;
+
   public function __construct()
   {
     parent::__construct();
   }
 
-  //Request URL Get Standard or set default values
-  public function parametersUrl($page = false, $take = false, $filter = [], $include = [], $fields = [])
-  {
-    $request = request();
-
-    return (object)[
-      "page" => is_numeric($request->input('page')) ? $request->input('page') : $page,
-      "take" => is_numeric($request->input('take')) ? $request->input('take') : $take,
-      "filter" => json_decode($request->input('filter')) ?? (object)$filter,
-      "include" => $request->input('include') ? explode(",", $request->input('include')) : $include,
-      "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $fields
-    ];
-  }
-
   //Return params from Request
   public function getParamsRequest($request, $params = [])
   {
-    //Convert to object the params
-    $defaultValues = (object)$params;
+    $defaultValues = (object)$params;//Convert to object the params
 
     //Set default values
     $default = (object)[
@@ -46,6 +35,9 @@ class BaseApiController extends BasePublicController
       'fields' => $defaultValues->fields ?? []
     ];
 
+    // set current auth user
+    $this->user = Auth::user();
+    $setting = $request->input('setting') ? json_decode($request->input('setting')) : false;
     //Return params
     $params = (object)[
       "page" => is_numeric($request->input('page')) ? $request->input('page') : $default->page,
@@ -54,14 +46,29 @@ class BaseApiController extends BasePublicController
       "filter" => json_decode($request->input('filter')) ?? (object)$default->filter,
       "include" => $request->input('include') ? explode(",", $request->input('include')) : $default->include,
       "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $default->fields,
-      "user" => Auth::user(),
+      'department' => $this->user ?
+        ($setting ? $this->user->departments()->where("iprofile__departments.id", $setting->departmentId)->first() : false) : false,
+      'role' => $this->user ?
+        ($setting ? $this->user->roles()->whereId($setting->roleId)->first() : false) : false,
+      'setting' => $setting,//Role and department selected
+      'settings' => $this->user ? $this->getSettings($request) : [],
+      'permissions' => $this->user ? $this->getPermissions($request) : [],
+      "user" => $this->user
     ];
 
-    //set language translation
-    if (isset($params->filter->locale) && !is_null($params->filter->locale))
-      \App::setLocale($params->filter->locale);
+    //Set language translation
+    if (isset($setting->locale) && !is_null($setting->locale)) {
+      \App::setLocale($setting->locale);
+    }
 
-    return $params;
+    //Set language translation by filter
+    if (isset($params->filter->locale) && !is_null($params->filter->locale)) {
+      \App::setLocale($params->filter->locale);
+    }
+
+    //Set locale to filter
+    $params->filter->locale = \App::getLocale();
+    return $params;//Response
   }
 
   //Validate if response Api is successful
@@ -87,16 +94,33 @@ class BaseApiController extends BasePublicController
     //if get errors, throw errors
     if ($validator->fails()) {
       $errors = json_decode($validator->errors());
-      throw new Exception(json_encode($errors), 401);
+      throw new Exception(json_encode($errors), 400);
     } else {//if vlaidation is sucessful, return true
       return true;
     }
+  }
+
+  //Validate if user has permission
+  public function validatePermission($request, $permissionName)
+  {
+    //Get permissions
+    $permissions = $this->getPermissions($request);
+
+    //Validate permissions
+    if ($permissions && !isset($permissions[$permissionName]))
+      throw new \Exception('Permission Denied', 403);
   }
 
   //Validate if code is like status response, and return status code
   public function getStatusError($code = false)
   {
     switch ($code) {
+      case 204:
+        return 204;
+        break;
+      case 400: //Bad Request
+        return 400;
+        break;
       case 401:
         return 401;
         break;
@@ -118,6 +142,127 @@ class BaseApiController extends BasePublicController
     }
   }
 
+  //Return all permissons assigned to user
+  public function getPermissions($request)
+  {
+    //Get Settings
+    $setting = $request->input('setting') ? json_decode($request->input('setting')) : false;
+    $this->user = \Auth::user();
+    $response = [];
+
+    //Get permissions user
+    if (isset($this->user) && isset($this->user->permissions))
+      $response = (array)$this->user->permissions;
+
+    //Get permissions role
+    if ($setting && isset($setting->roleId)) {
+      //Get role
+      $role = $this->user->roles()->whereId($setting->roleId)->first();
+
+      //Merge role permissions with user permissions
+      if ($role && isset($role->permissions))
+        $response = array_merge((array)$role->permissions, $response);
+    }
+
+    //Assigned global
+    $this->permissions = $response;
+
+    //Response
+    return $response;
+  }
+
+  //Return all settings assigned to user
+  public function getSettings($request)
+  {
+    //Get Settings
+    $setting = $request->input('setting') ? json_decode($request->input('setting')) : false;
+    $userSettings = [];
+    $departmentSettings = [];
+    $roleSettings = [];
+
+    //Order name settings
+    $orderNameSettings = function ($settings) {
+      $settings = $settings->toArray();//convert to array
+
+      //Create new key with name, and remove numeric key
+      foreach ($settings as $key => $setting) {
+        $settings[$setting['name']] = ((object)$setting)->value;
+        unset($settings[$key]);
+      }
+      return $settings;//Response
+    };
+
+    //Get settings user
+    if (isset($this->user)) {
+      $uSettings = $this->user->settings()->get();
+      if (isset($uSettings))
+        $userSettings = $orderNameSettings($uSettings);
+    }
+
+    if ($setting) {
+      //Get department Settings
+      if (isset($setting->departmentId)) {
+        //Get department
+        $department = $this->user->departments()
+          ->where('iprofile__departments.id', $setting->departmentId)
+          ->first();
+
+        //Merge role Settings with user settings
+        if ($department && isset($department->settings))
+          $departmentSettings = $orderNameSettings($department->settings);
+      }
+
+      //Get role Settings
+      if (isset($setting->roleId)) {
+        //Get role from user
+        $roleUser = $this->user->roles()->whereId($setting->roleId)->first();
+
+        if ($roleUser) {
+          //Get model role
+          $role = Role::find($roleUser->id);
+
+          //Merge role Settings with user settings
+          if ($role && isset($role->settings))
+            $roleSettings = $orderNameSettings($role->settings);
+        }
+      }
+    }
+
+    //Response
+    return array_merge($departmentSettings, $roleSettings, $userSettings);
+  }
+
+  //Get users from department
+  public function getUsersByDepartment($params, $pluck = 'id')
+  {
+    $department = $params->department;//Get Department
+    $exceptionRole = [1];//Exclude users from role "admin"
+    $response = [];//Data response
+
+    if (isset($department) && !empty($department)) {
+      if (isset($params->permissions['profile.user.index-by-department'])) {
+        $response = $department->users()
+          ->whereNotIn('users.id', function ($query) use ($exceptionRole) {
+            $query->select('user_id')->from('role_users')->whereIn('role_id', $exceptionRole);
+          })->get()->pluck($pluck)->toArray();
+
+        if ($department->children) {
+          foreach ($department->children as $subDepartment) {
+            $usersDepartment = $subDepartment->users()
+              ->whereNotIn('users.id', function ($query) use ($exceptionRole) {
+                $query->select('user_id')->from('role_users')->whereIn('role_id', $exceptionRole);
+              })->get()->pluck($pluck)->toArray();
+
+            $response = array_merge($response, $usersDepartment);
+          }
+        }
+      } else //if not has permission, return just id of user loged
+        $response = array_merge($response, [$params->user->id]);
+    }
+
+    return $response;//Response
+  }
+
   //Transform data of Paginate
   public function pageTransformer($data)
   {
@@ -127,11 +272,5 @@ class BaseApiController extends BasePublicController
       "perPage" => $data->perPage(),
       "currentPage" => $data->currentPage()
     ];
-  }
-
-  //Return current user
-  public function getAuthUser()
-  {
-    return Auth::user();
   }
 }
