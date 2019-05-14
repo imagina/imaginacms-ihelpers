@@ -1,5 +1,5 @@
 url: https://github.com/imagina/asgardcms-icommerce
-    "3.6.0":
+    "3.1.0":
       added:
         - eventes base imageable for all Modules
         - Helper validateJson
