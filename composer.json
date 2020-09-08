@@ -6,7 +6,7 @@
     "require": {
         "php": ">=7.0.0",
         "composer/installers": "~1.0",
-        "idavoll/core-module": "~3.0",
+        "imagina/core-module": "4.0.x-dev",
         "spatie/laravel-responsecache": "1"
     },
     "require-dev": {
@@ -19,7 +19,7 @@
             "Modules\\": "Modules/"
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "authors": [
       {
@@ -35,7 +35,7 @@
 
     "extra": {
       "branch-alias": {
-        "dev-master": "3.0.x-dev"
+        "dev-master": "4.0.x-dev"
       }
     }
 }
