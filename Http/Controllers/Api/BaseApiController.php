@@ -104,8 +104,11 @@ class BaseApiController extends BasePublicController
   public function validateRequestApi($request)
   {
     $request->setContainer(app());
-    $validator = $request->getValidator();
-    
+    if(method_exists($request, "getValidator"))
+      $validator = $request->getValidator();
+    else
+      $validator = Validator::make($request->all(), array_merge($request->rules(),method_exists($request, "translationRules") ? $request->translationRules() : []),array_merge($request->messages(), method_exists($request, "translationMessages")  ? $request->translationMessages() : []));
+  
     //if get errors, throw errors
     if ($validator->fails()) {
       $errors = json_decode($validator->errors());
