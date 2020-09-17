@@ -103,9 +103,9 @@ class BaseApiController extends BasePublicController
   //Validate if fields are validated according to rules
   public function validateRequestApi($request)
   {
-    //Create Validator
-    $validator = Validator::make($request->all(), array_merge($request->rules(),method_exists($request, "translationRules") ? $request->translationRules() : []),array_merge($request->messages(), method_exists($request, "translationMessages")  ? $request->translationMessages() : []));
-
+    $request->setContainer(app());
+    $validator = $request->getValidator();
+    
     //if get errors, throw errors
     if ($validator->fails()) {
       $errors = json_decode($validator->errors());
