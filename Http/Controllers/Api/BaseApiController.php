@@ -107,7 +107,7 @@ class BaseApiController extends BasePublicController
     if(method_exists($request, "getValidator"))
       $validator = $request->getValidator();
     else
-      $validator = Validator::make($request->all(), array_merge($request->rules(),method_exists($request, "translationRules") ? $request->translationRules() : []),array_merge($request->messages(), method_exists($request, "translationMessages")  ? $request->translationMessages() : []));
+      $validator = Validator::make($request->all(), $request->rules(),$request->messages());
   
     //if get errors, throw errors
     if ($validator->fails()) {
