@@ -94,7 +94,7 @@ class BaseApiController extends BasePublicController
 
     //If there is errors, throw error
     if (isset($data->errors))
-      throw new Exception($data->errors, $response->getStatusCode());
+      throw new \Exception($data->errors, $response->getStatusCode());
     else {//if response is successful, return response
       return $data->data;
     }
@@ -112,7 +112,7 @@ class BaseApiController extends BasePublicController
     //if get errors, throw errors
     if ($validator->fails()) {
       $errors = json_decode($validator->errors());
-      throw new Exception(json_encode($errors), 400);
+      throw new \Exception(json_encode($errors), 400);
     } else {//if vlaidation is sucessful, return true
       return true;
     }
