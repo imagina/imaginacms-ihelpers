@@ -66,7 +66,7 @@ In order to serve the static files directly once they've been cached, you need t
     RewriteRule . page-cache%{REQUEST_URI}.html [L]
     ```
   
-  ### CUSTOM include and relationship features:
+### CUSTOM include and relationship features:
   
   You can set custom includes and relationships in any entity from any module as follows:
 - **In Modules\Imodule\Config\config.php:**
