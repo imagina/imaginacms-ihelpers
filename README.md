@@ -65,3 +65,46 @@ In order to serve the static files directly once they've been cached, you need t
     RewriteCond %{DOCUMENT_ROOT}/page-cache%{REQUEST_URI}%{QUERY_STRING}.html -f
     RewriteRule . page-cache%{REQUEST_URI}.html [L]
     ```
+  
+  ### CUSTOM include and relationship features:
+  
+  You can set custom includes and relationships in any entity from any module as follows:
+- **In Modules\Imodule\Config\config.php:**
+   ```php
+   'includes'=>[
+       'EntityTransformer'=>[
+         'otherEntity'=>[
+           'path'=>'Modules\Iothermodule\Transformers\OtherEntityTransformer', //this is the transformer path
+           'multiple'=>false, //if the relationship is one-to-many, multiple must be set to true
+         ],
+       ],
+       ...
+   ],   
+   'relations' =>[
+     'entity'=>[
+       'otherEntity' => function () {
+         return $this->hasOne(
+           \Modules\Iothermodule\Entities\OtherEntity::class, 'model_id');
+       },
+     ],
+     ...
+   ],  
+   ```
+- **In Modules\Imodule\Entities\Entity.php:**
+  
+  You must be use the trait for use the custom relations as follows:
+  
+  ```php
+  use Modules\Ihelpers\Traits\Relationable;
+  class Entity extends Model{
+    use Relationable;
+  ```
+- **In Modules\Imodule\Transformers\EntityTransformer.php:**
+    
+  You must be use the trait for use the custom includes as follows:
+  
+  ```php
+    use Modules\Ihelpers\Traits\Transformeable;
+    class EntityTransformer extends Resource{
+      use Transformeable;
+  ```  
