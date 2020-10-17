@@ -13,7 +13,7 @@ trait Relationable
   {
     $classNamespace = get_class($this);
     $classNamespaceExploded = explode('\\',strtolower($classNamespace));
-    \Log::info($classNamespaceExploded);
+
     #i: Convert array to dot notation
     $config = implode('.', ['asgard.'.$classNamespaceExploded[1].'.config.relations.'.$classNamespaceExploded[3], $method]);
 
