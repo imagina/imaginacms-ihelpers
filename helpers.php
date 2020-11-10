@@ -10,7 +10,7 @@ if(! function_exists('canonical_url')) {
 }
 
 if(! function_exists('istr_slug')) {
-    function iStr::slug($title, $separator = '-', $language = 'en',$allowedchars=array())
+    function istr_slug($title, $separator = '-', $language = 'en',$allowedchars=array())
     {
         $title = Str::ascii($title, $language);
         // Convert all dashes/underscores into separator
