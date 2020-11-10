@@ -10,7 +10,7 @@ if(! function_exists('canonical_url')) {
 }
 
 if(! function_exists('istr_slug')) {
-    function istr_slug($title, $separator = '-', $language = 'en',$allowedchars=array())
+    function iStr::slug($title, $separator = '-', $language = 'en',$allowedchars=array())
     {
         $title = Str::ascii($title, $language);
         // Convert all dashes/underscores into separator
@@ -183,7 +183,7 @@ if (!function_exists('saveImage')) {
     }
 
     // if a base64 was sent, store it in the db
-    if (starts_with($value, 'data:image')) {
+    if (Str::startsWith($value, 'data:image')) {
       // 0. Make the image
       $image = \Image::make($value);
       // resize and prevent possible upsizing
@@ -198,7 +198,7 @@ if (!function_exists('saveImage')) {
 
       //setting end file (format)
       $endFile = 'jpg';
-      if(starts_with($value, 'data:image/png;'))
+      if(Str::startsWith($value, 'data:image/png;'))
         $endFile = 'png';
 
       \Log::info([$endFile, $size->imagesize->quality]);
