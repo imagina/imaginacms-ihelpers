@@ -2,10 +2,10 @@
 
 namespace Modules\Ihelpers\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
-class BaseApiTransformer extends Resource
+class BaseApiTransformer extends JsonResource
 {
   //Check if field is required in request
   public function ifRequestField($fieldName, $includeName = false)

@@ -2,6 +2,7 @@
 
 namespace Modules\Ihelpers\Http\Controllers\Api;
 
+use App;
 use Modules\Core\Http\Controllers\BasePublicController;
 use Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController;
 use Modules\Ihelpers\Http\Controllers\Api\SettingsApiController;
@@ -73,16 +74,16 @@ class BaseApiController extends BasePublicController
 
     //Set language translation
     if (isset($setting->locale) && !is_null($setting->locale)) {
-      \App::setLocale($setting->locale);
+      App::setLocale($setting->locale);
     }
 
     //Set language translation by filter
     if (isset($params->filter->locale) && !is_null($params->filter->locale)) {
-      \App::setLocale($params->filter->locale);
+      App::setLocale($params->filter->locale);
     }
 
     //Set locale to filter
-    $params->filter->locale = \App::getLocale();
+    $params->filter->locale = App::getLocale();
     return $params;//Response
   }
 
@@ -93,9 +94,9 @@ class BaseApiController extends BasePublicController
     $data = json_decode($response->content());
 
     //If there is errors, throw error
-    if (isset($data->errors))
-      throw new \Exception($data->errors, $response->getStatusCode());
-    else {//if response is successful, return response
+    if (isset($data->errors)) {
+         throw new Exception($data->errors, $response->getStatusCode());
+    }else {//if response is successful, return response
       return $data->data;
     }
   }
@@ -112,7 +113,7 @@ class BaseApiController extends BasePublicController
     //if get errors, throw errors
     if ($validator->fails()) {
       $errors = json_decode($validator->errors());
-      throw new \Exception(json_encode($errors), 400);
+      throw new Exception(json_encode($errors), 400);
     } else {//if vlaidation is sucessful, return true
       return true;
     }
@@ -160,6 +161,18 @@ class BaseApiController extends BasePublicController
         break;
     }
   }
+
+
+
+    //Validate if code is like status response, and return status code
+    public function getErrorMessage(\Exception $e) : string
+    {
+        if(env('APP_DEBUG')==true) {
+            return $e->getMessage()."\n".$e->getFile()."\n".$e->getLine().$e->getTraceAsString();
+        } else {
+            return $e->getMessage();
+        }
+    }
 
   //Get users from department
   public function getUsersByDepartment($params, $pluck = 'id')

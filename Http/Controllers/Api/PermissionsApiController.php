@@ -12,9 +12,10 @@ class PermissionsApiController extends BasePublicController
   //Get settings by relatedId and entityName
   public function index($params = [])
   {
+
     $params = (object)$params;//Conver params
     if (!$params || !$params->relatedId || !$params->entityName) return [];//Validate params
-    $permissions = [];//Defualt response
+    $permissions = [];//Default response
 
     //Request
     if (!is_array($params->relatedId)) $params->relatedId = [$params->relatedId];
@@ -27,12 +28,15 @@ class PermissionsApiController extends BasePublicController
     if ($params->entityName == 'role')
       $permissionsData = Role::whereIn('id', $params->relatedId)->get()->pluck('permissions')->toArray();
 
+
     //Merge all permissions
     foreach ($permissionsData as $group) {
-      foreach ($group as $name => $value) {
-        if (!isset($permissions[$name])) $permissions[$name] = $value;
-        else if (!$permissions[$name]) $permissions[$name] = $value;
-      }
+        if(is_array($group)) {
+          foreach ($group as $name => $value) {
+            if (!isset($permissions[$name])) $permissions[$name] = $value;
+            else if (!$permissions[$name]) $permissions[$name] = $value;
+          }
+        }
     }
 
     //Response
