@@ -37,13 +37,13 @@ class SettingsApiController extends BasePublicController
       });
 
       //Set setting if the setting exist the same number of relatedIds
-      if (count($params->relatedId) == count($filtered)) {
+      //if (count($params->relatedId) == count($filtered)) {
         //Merge if is array
         if (is_array($settingValue))
           $settings[$settingName] = array_merge(($settings[$settingName] ?? []), $settingValue);
         //Replace value
         else $settings[$settingName] = $settingValue;
-      };
+      //};
     }
 
     //Response
