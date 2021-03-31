@@ -54,7 +54,7 @@ class BaseApiController extends BasePublicController
       "take" => is_numeric($request->input('take')) ? $request->input('take') :
         ($request->input('page') ? 12 : $default->take),
       "filter" => !$request->input('filter') ? (object)$default->filter :
-        (is_string($request->input('filter')) ? json_decode($request->input('filter')) : (object)$request->input('filter')),
+        (is_string($request->input('filter')) ? json_decode($request->input('filter')) : json_decode(json_encode($request->input('filter')))),
       "include" => $request->input('include') ? explode(",", $request->input('include')) : $default->include,
       "fields" => $request->input('fields') ? explode(",", $request->input('fields')) : $default->fields,
       'department' => $department,
