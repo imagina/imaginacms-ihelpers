@@ -11,7 +11,8 @@ trait UserStamps
      *
      * @param bool
      */
-    protected $userstamping = true;
+    public $userstamping = true;
+
 
 
     public static function boot()
@@ -20,7 +21,7 @@ trait UserStamps
         parent::boot();
 
         /**
-         * add created_by and pudated_by field to model fillable
+         * add created_by and updated_by field to model fillable
          *
          */
         static::retrieved(function($model) {
@@ -55,6 +56,49 @@ trait UserStamps
 
             $model->{$model->getUpdatedByColumn()} = \Auth::id();
         });
+        if(static::usingSoftDeletes()){
+            static::deleting(function($model){
+                if (! $model->isSoftDeleting() || is_null($model->getDeletedByColumn())) {
+                    return;
+                }
+
+                if (is_null($model->{$model->getDeletedByColumn()})) {
+                    $model->{$model->getDeletedByColumn()} = \Auth::id();
+                }
+
+                $dispatcher = $model->getEventDispatcher();
+
+                $model->unsetEventDispatcher();
+
+                $model->save();
+
+                $model->setEventDispatcher($dispatcher);
+            });
+            static::restoring(function($model){
+
+                if (! $model->isSoftDeleting() || is_null($model->getDeletedByColumn())) {
+                    return;
+                }
+
+                $model->{$model->getDeletedByColumn()} = null;
+            });
+        }
+    }
+
+    /**
+     * Has the model loaded the SoftDeletes trait.
+     *
+     * @return bool
+     */
+    public static function usingSoftDeletes()
+    {
+        static $usingSoftDeletes;
+
+        if (is_null($usingSoftDeletes)) {
+            return $usingSoftDeletes = in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(get_called_class()));
+        }
+
+        return $usingSoftDeletes;
     }
 
     /**
@@ -78,6 +122,16 @@ trait UserStamps
     }
 
     /**
+     * Get the name of the "deleted by" column.
+     *
+     * @return string
+     */
+    public function getDeletedByColumn()
+    {
+        return defined('static::DELETED_BY') ? static::DELETED_BY : 'deleted_by';
+    }
+
+    /**
      * Get the user that created the model.
      */
     public function creator()
@@ -91,6 +145,14 @@ trait UserStamps
     public function editor()
     {
         return $this->belongsTo($this->getUserClass(), $this->getUpdatedByColumn());
+    }
+
+    /**
+     * Get the user that deleted the model.
+     */
+    public function destroyer()
+    {
+        return $this->belongsTo($this->getUserClass(), $this->getDeletedByColumn());
     }
 
 
@@ -107,6 +169,16 @@ trait UserStamps
     public function isUserstamping()
     {
         return $this->userstamping;
+    }
+
+    /**
+     * Check if we're maintaing Userstamps on the model.
+     *
+     * @return bool
+     */
+    public function isSoftDeleting()
+    {
+        return $this->softdeleting ?? false;
     }
 
 }
