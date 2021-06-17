@@ -108,3 +108,80 @@ In order to serve the static files directly once they've been cached, you need t
     class EntityTransformer extends JsonResource{
       use Transformeable;
   ```  
+
+### UserStamp (created_by, updated_by and deleted_by-deleted_at) feature:
+
+ **First, you must create a migration with following fields:**
+ 
+ 
+ 
+ Usually generated as Modules\Imodule\Database\Migrations\2021_04_28_173335_add_userstamps_to_imodule_table_table.php:
+ 
+  ```php
+    use Illuminate\Support\Facades\Schema;
+    use Illuminate\Database\Schema\Blueprint;
+    use Illuminate\Database\Migrations\Migration;
+    
+    class AddUserstampsToImoduleTableTable extends Migration
+    {
+        /**
+         * Run the migrations.
+         *
+         * @return void
+         */
+        public function up()
+        {
+            Schema::table('imodule__table', function (Blueprint $table) {
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
+                $table->integer('deleted_by')->unsigned()->nullable();
+                $table->timestamp('deleted_at')->nullable();
+                $table->foreign('created_by')->references('id')->on(config('auth.table', 'users'))->onDelete('restrict');
+                $table->foreign('updated_by')->references('id')->on(config('auth.table', 'users'))->onDelete('restrict');
+                $table->foreign('deleted_by')->references('id')->on(config('auth.table', 'users'))->onDelete('restrict');
+            });
+        }
+    
+        /**
+         * Reverse the migrations.
+         *
+         * @return void
+         */
+        public function down()
+        {
+            Schema::table('imodule__table', function (Blueprint $table) {
+                $table->dropForeign(['created_by']);
+                $table->dropForeign(['updated_by']);
+                $table->dropForeign(['deleted_by']);
+                $table->dropColumn(['created_by','updated_by','deleted_by','deleted_at']);
+            });
+        }
+    }
+
+  ``` 
+**Use in Module Entities**
+
+**In Modules\Imodule\Entities\Entity.php:**
+  
+  You must be use the trait for use the user stamps as follows:
+  
+  ```php
+  use Modules\Ihelpers\Traits\UserStamps;
+  class Entity extends Model{
+    use UserStamps;
+  ```
+  
+  Besides, if you want to use softdeleting you must use the SoftDeletes trait and set softdeleting to true:
+  
+  ```php
+  use Modules\Ihelpers\Traits\UserStamps;
+  use Illuminate\Database\Eloquent\SoftDeletes;
+  class Entity extends Model{
+    use UserStamps, SoftDeletes;
+    
+    protected $table = 'imodule__table';
+    
+    protected $softdeleting = true; //it enables or disables the softdeleting
+  ```
+
+
