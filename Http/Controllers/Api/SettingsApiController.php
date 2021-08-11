@@ -37,13 +37,13 @@ class SettingsApiController extends BasePublicController
       });
 
       //Set setting if the setting exist the same number of relatedIds
-      if (count($params->relatedId) == count($filtered)) {
+      //if (count($params->relatedId) == count($filtered)) {
         //Merge if is array
         if (is_array($settingValue))
           $settings[$settingName] = array_merge(($settings[$settingName] ?? []), $settingValue);
         //Replace value
         else $settings[$settingName] = $settingValue;
-      };
+      //};
     }
 
     //Response
@@ -64,9 +64,7 @@ class SettingsApiController extends BasePublicController
       $params->roleId = $user->roles->pluck('id')->toArray();
     //Validate department id
     if (!isset($params->departmentId) || !$params->departmentId)
-      $params->departmentId = $user->roles->pluck('id')->toArray();
-
-    //dd($user, $params);
+      $params->departmentId = $user->departments->pluck('id')->toArray();
 
     //Get settings per entity
     $userSettings = $this->index(['relatedId' => $params->userId, 'entityName' => 'user']);
