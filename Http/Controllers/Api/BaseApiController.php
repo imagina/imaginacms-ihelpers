@@ -50,6 +50,7 @@ class BaseApiController extends BasePublicController
 
     //Return params
     $params = (object)[
+      "order" => $request->input('order') ? json_decode($request->input('order')) : null,
       "page" => is_numeric($request->input('page')) ? $request->input('page') : $default->page,
       "take" => is_numeric($request->input('take')) ? $request->input('take') :
         ($request->input('page') ? 12 : $default->take),
@@ -162,7 +163,6 @@ class BaseApiController extends BasePublicController
         break;
     }
   }
-
 
   //Validate if code is like status response, and return status code
   public function getErrorMessage(\Exception $e): string
