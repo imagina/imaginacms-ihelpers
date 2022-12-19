@@ -35,7 +35,7 @@ class UniqueSlugRule implements Rule
     {
   
       $explodeAttributes = explode(".",$attribute);
-      $slugs = \DB::connection(env('DB_CONNECTION', 'mysql'))->table($this->table)
+      $slugs = \DB::table($this->table)
         ->where($explodeAttributes[1],$value)
         ->where('locale',$explodeAttributes[0]);
       
