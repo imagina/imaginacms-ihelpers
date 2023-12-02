@@ -152,6 +152,8 @@ class BaseApiController extends BasePublicController
       case 404:
         return 404;
         break;
+      case 406:
+        return 406;
       case 409:
         return 409;
         break;
