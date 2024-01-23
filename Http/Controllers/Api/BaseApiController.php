@@ -9,6 +9,7 @@ use Modules\Ihelpers\Http\Controllers\Api\SettingsApiController;
 use Mockery\CountValidator\Exception;
 use Illuminate\Support\Facades\Auth;
 use Modules\Iprofile\Entities\Role;
+use Modules\Iprofile\Repositories\UserApiRepository;
 use Validator;
 
 class BaseApiController extends BasePublicController
@@ -17,17 +18,20 @@ class BaseApiController extends BasePublicController
   private $settingsController;
   private $permissionsController;
   private $user;
-
+  private $userApiRepository;
+  
   public function __construct()
   {
+
   }
 
   //Return params from Request
   public function getParamsRequest($request, $params = [])
   {
     $defaultValues = (object)$params;//Convert to object the params
-    $this->settingsController = new SettingsApiController();
-    $this->permissionsController = new PermissionsApiController();
+    $this->settingsController = app("Modules\Ihelpers\Http\Controllers\Api\SettingsApiController");
+    $this->permissionsController = app("Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController");
+    $this->userApiRepository = app("Modules\Iprofile\Repositories\UserApiRepository");
 
     //Set default values
     $default = (object)[
@@ -40,10 +44,11 @@ class BaseApiController extends BasePublicController
 
     // set current auth user
     $this->user = Auth::user();
+    $this->user = $this->userApiRepository->getItem($this->user->id,json_decode(json_encode(["include" => ["roles","departments"]])));
     $setting = $request->input('setting') ? (is_string($request->input('setting')) ? json_decode($request->input('setting')) : (is_array($request->input('setting')) ? json_decode(json_encode($request->input('setting'))) : $request->input('setting'))) : false;
 
-    $departments = $this->user ? $this->user->departments()->get() : false;//Department data
-    $roles = $this->user ? $this->user->roles()->get() : false;//Role data
+    $departments = $this->user ? $this->user->departments : false;//Department data
+    $roles = $this->user ? $this->user->roles : false;//Role data
     $department = ($departments && $setting && isset($setting->departmentId)) ?
       $departments->where("id", $setting->departmentId)->first() : false;
     $role = ($roles && $setting && isset($setting->roleId)) ? $roles->where("id", $setting->roleId)->first() : false;

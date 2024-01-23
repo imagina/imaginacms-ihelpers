@@ -3,12 +3,18 @@
 namespace Modules\Ihelpers\Http\Controllers\Api;
 
 use Modules\Core\Http\Controllers\BasePublicController;
+use Modules\Iprofile\Repositories\UserApiRepository;
 use Modules\User\Entities\Sentinel\User;
 use Modules\Iprofile\Entities\Role;
 use Illuminate\Support\Arr;
 
 class PermissionsApiController extends BasePublicController
 {
+  private $userApiRepository;
+  public function __construct(UserApiRepository $userApiRepository)
+  {
+    $this->userApiRepository = $userApiRepository;
+  }
   
   //Get settings by relatedId and entityName
   public function index($params = [])
@@ -22,8 +28,10 @@ class PermissionsApiController extends BasePublicController
     if (!is_array($params->relatedId)) $params->relatedId = [$params->relatedId];
 
     //Get user permissons
-    if ($params->entityName == 'user')
-      $permissionsData = User::whereIn('id', $params->relatedId)->get()->pluck('permissions')->toArray();
+    if ($params->entityName == 'user'){
+      $user = $this->userApiRepository->getItem($params->relatedId);
+      $permissionsData = $user->pluck('permissions')->toArray();
+    }
 
     //Get role permissons
     if ($params->entityName == 'role'){
@@ -53,8 +61,8 @@ class PermissionsApiController extends BasePublicController
     $permissions = [];//Default response
 
     if (!isset($params->userId) || !$params->userId) return [];//Validate userID params
-    
-    $user = User::with('roles')->where("id",$params->userId)->first();//Get user data
+  
+    $user = $this->userApiRepository->getItem($params->userId,json_decode(json_encode(["include" => ["roles"]])));
 
     if (!isset($params->roleId) || !$params->roleId) $params->roleId = $user->roles->pluck('id')->toArray();//Validate roleId
 
