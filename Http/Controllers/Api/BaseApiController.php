@@ -132,7 +132,7 @@ class BaseApiController extends BasePublicController
   public function validatePermission($request, $permissionName)
   {
     //Get permissions
-    $this->permissionsController = new PermissionsApiController();
+    $this->permissionsController = app("Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController");
     $permissions = $this->permissionsController->getAll($request);
 
     //Validate permissions
