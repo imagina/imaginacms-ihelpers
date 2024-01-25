@@ -32,7 +32,7 @@ class BaseApiController extends BasePublicController
     $this->settingsController = app("Modules\Ihelpers\Http\Controllers\Api\SettingsApiController");
     $this->permissionsController = app("Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController");
     $this->userApiRepository = app("Modules\Iprofile\Repositories\UserApiRepository");
-
+  
     //Set default values
     $default = (object)[
       "page" => $defaultValues->page ?? false,
@@ -41,10 +41,12 @@ class BaseApiController extends BasePublicController
       'include' => $defaultValues->include ?? [],
       'fields' => $defaultValues->fields ?? []
     ];
-
+  
     // set current auth user
     $this->user = Auth::user();
-    $this->user = $this->userApiRepository->getItem($this->user->id,json_decode(json_encode(["include" => ["roles","departments"]])));
+    if (isset($this->user->id)) {
+      $this->user = $this->userApiRepository->getItem($this->user->id, json_decode(json_encode(["include" => ["roles", "departments"]])));
+    }
     $setting = $request->input('setting') ? (is_string($request->input('setting')) ? json_decode($request->input('setting')) : (is_array($request->input('setting')) ? json_decode(json_encode($request->input('setting'))) : $request->input('setting'))) : false;
 
     $departments = $this->user ? $this->user->departments : false;//Department data
