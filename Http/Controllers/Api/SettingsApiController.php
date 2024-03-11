@@ -57,7 +57,8 @@ class SettingsApiController extends BasePublicController
     $settings = [];//Default response
 
     if (!isset($params->userId) || !$params->userId) return [];//Validate userID params
-    $user = User::with('roles', 'departments')->where('id',$params->userId)->first();//Get user data
+    $userApiRepository = app("Modules\Iprofile\Repositories\UserApiRepository");
+    $user = $userApiRepository->getItem($params->userId,json_decode(json_encode(["include" => ["roles","departments"]])));
 
     //Validate roleId
     if (!isset($params->roleId) || !$params->roleId)

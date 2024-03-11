@@ -30,7 +30,7 @@ class PermissionsApiController extends BasePublicController
     //Get user permissons
     if ($params->entityName == 'user'){
       $user = $this->userApiRepository->getItem($params->relatedId);
-      $permissionsData = $user->pluck('permissions')->toArray();
+      $permissionsData = $user->permissions;
     }
 
     //Get role permissons
