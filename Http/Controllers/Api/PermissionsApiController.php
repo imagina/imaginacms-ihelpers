@@ -11,15 +11,16 @@ use Illuminate\Support\Arr;
 class PermissionsApiController extends BasePublicController
 {
   private $userApiRepository;
+
   public function __construct(UserApiRepository $userApiRepository)
   {
     $this->userApiRepository = $userApiRepository;
   }
-  
+
   //Get settings by relatedId and entityName
   public function index($params = [])
   {
-    
+
     $params = (object)$params;//Conver params
     if (!$params || !$params->relatedId || !$params->entityName) return [];//Validate params
     $permissions = [];//Default response
@@ -28,26 +29,28 @@ class PermissionsApiController extends BasePublicController
     if (!is_array($params->relatedId)) $params->relatedId = [$params->relatedId];
 
     //Get user permissons
-    if ($params->entityName == 'user'){
-      $user = $this->userApiRepository->getItem($params->relatedId);
-      $permissionsData = $user->permissions;
+    if ($params->entityName == 'user') {
+      $permissionsData = $this->userApiRepository->getItemsBy(json_decode(json_encode([
+        "filter" => ["id" => $params->relatedId]
+      ])))->pluck('permissions')->toArray();
     }
 
     //Get role permissons
-    if ($params->entityName == 'role'){
+    if ($params->entityName == 'role') {
       $roleRepository = app("Modules\Iprofile\Repositories\RoleApiRepository");
-      $permissionsData = $roleRepository->getItemsBy(json_decode(json_encode(["filter" => ["id" => $params->relatedId]])))->pluck('permissions')->toArray();
+      $permissionsData = $roleRepository->getItemsBy(json_decode(json_encode([
+        "filter" => ["id" => $params->relatedId]
+      ])))->pluck('permissions')->toArray();
     }
-
 
     //Merge all permissions
     foreach ($permissionsData as $group) {
-        if(is_array($group)) {
-          foreach ($group as $name => $value) {
-            if (!isset($permissions[$name])) $permissions[$name] = $value;
-            else if (!$permissions[$name]) $permissions[$name] = $value;
-          }
+      if (is_array($group)) {
+        foreach ($group as $name => $value) {
+          if (!isset($permissions[$name])) $permissions[$name] = $value;
+          else if (!$permissions[$name]) $permissions[$name] = $value;
         }
+      }
     }
 
     //Response
@@ -61,8 +64,8 @@ class PermissionsApiController extends BasePublicController
     $permissions = [];//Default response
 
     if (!isset($params->userId) || !$params->userId) return [];//Validate userID params
-  
-    $user = $this->userApiRepository->getItem($params->userId,json_decode(json_encode(["include" => ["roles"]])));
+
+    $user = $this->userApiRepository->getItem($params->userId, json_decode(json_encode(["include" => ["roles"]])));
 
     if (!isset($params->roleId) || !$params->roleId) $params->roleId = $user->roles->pluck('id')->toArray();//Validate roleId
 
