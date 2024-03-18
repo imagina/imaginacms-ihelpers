@@ -11,37 +11,40 @@ use Validator;
 
 class BaseApiController extends BasePublicController
 {
-    private $permissions;
+  private $permissions;
+  private $settingsController;
+  private $permissionsController;
+  private $user;
+  private $userApiRepository;
 
-    private $settingsController;
+  public function __construct()
+  {
 
-    private $permissionsController;
+  }
 
-    private $user;
+  //Return params from Request
+  public function getParamsRequest($request, $params = [])
+  {
+    $defaultValues = (object)$params;//Convert to object the params
+    $this->settingsController = app("Modules\Ihelpers\Http\Controllers\Api\SettingsApiController");
+    $this->permissionsController = app("Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController");
+    $this->userApiRepository = app("Modules\Iprofile\Repositories\UserApiRepository");
 
-    public function __construct()
-    {
+    //Set default values
+    $default = (object)[
+      "page" => $defaultValues->page ?? false,
+      "take" => $defaultValues->take ?? false,
+      "filter" => $defaultValues->filter ?? [],
+      'include' => $defaultValues->include ?? [],
+      'fields' => $defaultValues->fields ?? []
+    ];
+
+    // set current auth user
+    $this->user = Auth::user();
+    if (isset($this->user->id)) {
+      $this->user = $this->userApiRepository->getItem($this->user->id, json_decode(json_encode(["include" => ["roles", "departments"]])));
     }
-
-    //Return params from Request
-    public function getParamsRequest($request, $params = [])
-    {
-        $defaultValues = (object) $params; //Convert to object the params
-        $this->settingsController = new SettingsApiController();
-        $this->permissionsController = new PermissionsApiController();
-
-        //Set default values
-        $default = (object) [
-            'page' => $defaultValues->page ?? false,
-            'take' => $defaultValues->take ?? false,
-            'filter' => $defaultValues->filter ?? [],
-            'include' => $defaultValues->include ?? [],
-            'fields' => $defaultValues->fields ?? [],
-        ];
-
-        // set current auth user
-        $this->user = Auth::user();
-        $setting = $request->input('setting') ? (is_string($request->input('setting')) ? json_decode($request->input('setting')) : (is_array($request->input('setting')) ? json_decode(json_encode($request->input('setting'))) : $request->input('setting'))) : false;
+    $setting = $request->input('setting') ? (is_string($request->input('setting')) ? json_decode($request->input('setting')) : (is_array($request->input('setting')) ? json_decode(json_encode($request->input('setting'))) : $request->input('setting'))) : false;
 
         $departments = $this->user ? $this->user->departments()->get() : false; //Department data
         $roles = $this->user ? $this->user->roles()->get() : false; //Role data
@@ -124,12 +127,12 @@ class BaseApiController extends BasePublicController
         }
     }
 
-    //Validate if user has permission
-    public function validatePermission($request, $permissionName)
-    {
-        //Get permissions
-        $this->permissionsController = new PermissionsApiController();
-        $permissions = $this->permissionsController->getAll($request);
+  //Validate if user has permission
+  public function validatePermission($request, $permissionName)
+  {
+    //Get permissions
+    $this->permissionsController = app("Modules\Ihelpers\Http\Controllers\Api\PermissionsApiController");
+    $permissions = $this->permissionsController->getAll($request);
 
         //Validate permissions
         if ($permissions && ! isset($permissions[$permissionName])) {
@@ -137,36 +140,41 @@ class BaseApiController extends BasePublicController
         }
     }
 
-    //Validate if code is like status response, and return status code
-    public function getStatusError($code = false)
-    {
-        switch ($code) {
-            case 204:
-                return 204;
-                break;
-            case 400: //Bad Request
-                return 400;
-                break;
-            case 401:
-                return 401;
-                break;
-            case 403:
-                return 403;
-                break;
-            case 404:
-                return 404;
-                break;
-            case 502:
-                return 502;
-                break;
-            case 504:
-                return 504;
-                break;
-            default:
-                return 500;
-                break;
-        }
+  //Validate if code is like status response, and return status code
+  public function getStatusError($code = false)
+  {
+    switch ($code) {
+      case 204:
+        return 204;
+        break;
+      case 400: //Bad Request
+        return 400;
+        break;
+      case 401:
+        return 401;
+        break;
+      case 403:
+        return 403;
+        break;
+      case 404:
+        return 404;
+        break;
+      case 406:
+        return 406;
+      case 409:
+        return 409;
+        break;
+      case 502:
+        return 502;
+        break;
+      case 504:
+        return 504;
+        break;
+      default:
+        return 500;
+        break;
     }
+  }
 
     //Validate if code is like status response, and return status code
     public function getErrorMessage(\Exception $e): string
