@@ -4,7 +4,7 @@ namespace Modules\Ihelpers\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class UniqueSlugRule implements Rule
+class UniqueRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -24,7 +24,7 @@ class UniqueSlugRule implements Rule
         $this->table = $table;
         $this->id = $id;
         $this->columnId = $columnId;
-        $this->message = ! empty($message) ? $message : 'There are another register with the same slug-locale.';
+        $this->message = ! empty($message) ? $message : 'There are another register with the same email.';
     }
 
     /**
@@ -32,20 +32,20 @@ class UniqueSlugRule implements Rule
      *
      * @param  mixed  $value
      */
-    public function passes($attribute, $value): bool
+    public function passes($attribute, $value)
     {
         $explodeAttributes = explode('.', $attribute);
-        $slugs = \DB::table($this->table)
-          ->where($explodeAttributes[1], $value)
-          ->where('locale', $explodeAttributes[0]);
+
+        $items = \DB::connection(env('DB_CONNECTION', 'mysql'))->table($this->table)
+          ->where($explodeAttributes[0], $value);
 
         if ($this->id) {
-            $slugs = $slugs->where($this->columnId, '!=', $this->id);
+            $items = $items->where($this->columnId, '!=', $this->id);
         }
 
-        $slugs = $slugs->first();
+        $items = $items->first();
 
-        return ! $slugs;
+        return !$items;
     }
 
     /**

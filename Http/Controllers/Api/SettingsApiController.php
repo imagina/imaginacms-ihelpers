@@ -37,13 +37,13 @@ class SettingsApiController extends BasePublicController
       });
 
       //Set setting if the setting exist the same number of relatedIds
-      if (count($params->relatedId) == count($filtered)) {
+      //if (count($params->relatedId) == count($filtered)) {
         //Merge if is array
         if (is_array($settingValue))
           $settings[$settingName] = array_merge(($settings[$settingName] ?? []), $settingValue);
         //Replace value
         else $settings[$settingName] = $settingValue;
-      };
+      //};
     }
 
     //Response
@@ -57,16 +57,15 @@ class SettingsApiController extends BasePublicController
     $settings = [];//Default response
 
     if (!isset($params->userId) || !$params->userId) return [];//Validate userID params
-    $user = User::with('roles', 'departments')->where('id',$params->userId)->first();//Get user data
+    $userApiRepository = app("Modules\Iprofile\Repositories\UserApiRepository");
+    $user = $userApiRepository->getItem($params->userId,json_decode(json_encode(["include" => ["roles","departments"]])));
 
     //Validate roleId
     if (!isset($params->roleId) || !$params->roleId)
       $params->roleId = $user->roles->pluck('id')->toArray();
     //Validate department id
     if (!isset($params->departmentId) || !$params->departmentId)
-      $params->departmentId = $user->roles->pluck('id')->toArray();
-
-    //dd($user, $params);
+      $params->departmentId = $user->departments->pluck('id')->toArray();
 
     //Get settings per entity
     $userSettings = $this->index(['relatedId' => $params->userId, 'entityName' => 'user']);
