@@ -39,7 +39,10 @@ class PermissionsApiController extends BasePublicController
     if ($params->entityName == 'role') {
       $roleRepository = app("Modules\Iprofile\Repositories\RoleApiRepository");
       $permissionsData = $roleRepository->getItemsBy(json_decode(json_encode([
-        "filter" => ["id" => $params->relatedId]
+        "filter" => [
+            "id" => $params->relatedId,
+            "withoutTenancy" => true
+        ]
       ])))->pluck('permissions')->toArray();
     }
 
