@@ -17,13 +17,17 @@ class DeleteFunctionRule implements Rule
   public $id;
   public $columnId;
   public $message;
+  public $relatedItemsRepository;
+  public $itemRelated;
 
-  public function __construct($table, $id = null, $columnId = '', $message = '')
+  public function __construct($table, $id = null, $columnId = '', $message = '', $relatedItemsRepository = '', $itemRelated = '')
   {
     $this->table = $table;
     $this->id = $id;
     $this->columnId = $columnId;
     $this->message = !empty($message) ? $message : 'This resource cannot be deleted because it is associated with other records.';
+    $this->relatedItemsRepository = $relatedItemsRepository;
+    $this->itemRelated = $itemRelated;
   }
 
   /**
@@ -39,10 +43,10 @@ class DeleteFunctionRule implements Rule
       $query->where($this->columnId, $this->id ?? $value);
     }
 
-    $relatedPostIds = $query->pluck('post_id');
+    $relatedPostIds = $query->pluck($this->itemRelated);
 
     if ($relatedPostIds->isNotEmpty()) {
-      $postRepository = app('Modules\Iblog\Repositories\PostRepository');
+      $postRepository = app($this->relatedItemsRepository);
 
       $params = (object)[
         'filter' => ['id' => $relatedPostIds->toArray()]
