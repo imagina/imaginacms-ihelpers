@@ -2,7 +2,9 @@
 
 namespace Modules\Ihelpers\Rules;
 
+use http\Params;
 use Illuminate\Contracts\Validation\Rule;
+use Modules\Iblog\Repositories\PostRepository;
 
 class DeleteFunctionRule implements Rule
 {
@@ -35,6 +37,20 @@ class DeleteFunctionRule implements Rule
 
     if ($this->columnId) {
       $query->where($this->columnId, $this->id ?? $value);
+    }
+
+    $relatedPostIds = $query->pluck('post_id');
+
+    if ($relatedPostIds->isNotEmpty()) {
+      $postRepository = app('Modules\Iblog\Repositories\PostRepository');
+
+      $params = (object)[
+        'filter' => ['id' => $relatedPostIds->toArray()]
+      ];
+
+      $posts = $postRepository->getItemsBy($params);
+
+      return $posts->isEmpty();
     }
 
     return !$query->exists();
